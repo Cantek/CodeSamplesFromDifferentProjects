@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>sprite57</title>
+</head>
+<body>
+<canvas id="sprite57" width="40" height="40" style="border:2px solid #cccccc;"></canvas>
+<script src=".\sprite57\jaf.js"></script>
+<script>
+ST('sprite57', function(_f) {
+    _f.setFps(24);
+    _f.defaults.debug = false;
+    _f.loop = true;
+    // Create sprite: mm
+    var mm = new ST.movieclip('mm', 10, true, _f);
+    var l0 = mm.layer('l0', 0);
+    l0.frameclip('t0', 0, 0, 1)
+    .shape('shape38', './sprite57/shape38.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 20, 20]);
+
+    l0.frameclip('t1', 1, 1, 1)
+    .shape('shape40', './sprite57/shape40.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(1, [1, 0, 0, 1, 20, 20]);
+
+    l0.frameclip('t2', 2, 2, 1)
+    .shape('shape42', './sprite57/shape42.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(2, [1, 0, 0, 1, 20, 20]);
+
+    l0.frameclip('t3', 3, 3, 1)
+    .shape('shape44', './sprite57/shape44.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(3, [1, 0, 0, 1, 20, 20]);
+
+    l0.frameclip('t4', 4, 4, 1)
+    .shape('shape46', './sprite57/shape46.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(4, [1, 0, 0, 1, 20, 20]);
+
+    l0.frameclip('t5', 5, 5, 1)
+    .shape('shape48', './sprite57/shape48.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(5, [1, 0, 0, 1, 20, 20]);
+
+    l0.frameclip('t6', 6, 6, 1)
+    .shape('shape50', './sprite57/shape50.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(6, [1, 0, 0, 1, 20, 20]);
+
+    l0.frameclip('t7', 7, 7, 1)
+    .shape('shape52', './sprite57/shape52.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(7, [1, 0, 0, 1, 20, 20]);
+
+    l0.frameclip('t8', 8, 8, 1)
+    .shape('shape54', './sprite57/shape54.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(8, [1, 0, 0, 1, 20, 20]);
+
+    l0.frameclip('t9', 9, 9, 1)
+    .shape('shape56', './sprite57/shape56.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(9, [1, 0, 0, 1, 20, 20]);
+
+
+
+    _f.mc(mm);
+    _f.start();
+});
+</script>
+</body>
+</html>

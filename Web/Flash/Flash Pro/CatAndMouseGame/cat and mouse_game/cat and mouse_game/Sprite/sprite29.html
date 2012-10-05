@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>sprite29</title>
+</head>
+<body>
+<canvas id="sprite29" width="0" height="0" style="border:2px solid #cccccc;"></canvas>
+<script src=".\sprite29\jaf.js"></script>
+<script>
+ST('sprite29', function(_f) {
+    _f.setFps(24);
+    _f.defaults.debug = false;
+    _f.loop = true;
+    // Create sprite: mm
+    var mm = new ST.movieclip('mm', 54, true, _f);
+    var l0 = mm.layer('l0', 0);
+
+
+    _f.mc(mm);
+    _f.start();
+});
+</script>
+</body>
+</html>

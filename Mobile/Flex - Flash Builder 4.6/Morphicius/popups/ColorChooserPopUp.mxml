@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						   xmlns:s="library://ns.adobe.com/flex/spark"
+						   creationComplete="comboPopUp_creationCompleteHandler(event)"
+						   backgroundColor="#FFFFFF"
+						   backgroundAlpha="0.5"
+						   >
+	
+	<fx:Script>
+		<![CDATA[				
+			import events.ComboEvent;
+			
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import views.EditorView;
+			[Bindable] public var colorValue:uint;     //var used  color in this class
+			private var newColor:String = new String(); // var used to assemble RGB values
+			public var editor:EditorView = null;
+			// Utility to account for values that are 0-15 being one character and compensate
+			// without this, 15 returns "f", hence 15, 15, 15 would be "fff" instead of 0f0f0f
+			private function checkLength(s:String):String
+			{
+				var str:String = s;
+				if (str.length < 2)
+				{
+					str = "0" + str;
+				}
+				return str;
+			}
+			
+			private function setColor():void
+			{
+				var R:String = (rSlider.value).toString(16);
+				R = checkLength(R);
+				var G:String = (gSlider.value).toString(16);
+				G = checkLength(G);
+				var B:String = (bSlider.value).toString(16);
+				B = checkLength(B);
+				
+				//If you need to access the "0xFFFFFF" string, use this
+				newColor = "0x" + R + G + B; 
+				trace("newColor = " + newColor);
+				//If you need to access the uint value, use this
+				colorValue = parseInt(newColor,16); 
+				trace(colorValue);
+			}
+			
+			protected function setLineColor():void
+			{
+				colorValue = parseInt(newColor,16); 
+				dispatchEvent(new ComboEvent(ComboEvent.COMBO_CLOSED,this));
+				this.close();
+			}	
+			
+			protected function comboPopUp_creationCompleteHandler(event:FlexEvent):void
+			{
+				PopUpManager.centerPopUp(this);
+			}
+	
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+	<s:HGroup width="100%">		
+	<s:Image width="25%" height="30" click="setLineColor()" smooth="true" smoothingQuality="high"
+			 source="assets/success.png"/>
+	<s:Image width="25%" height="30" click="editor.tools(); this.close()" smooth="true" smoothingQuality="high"
+			 source="assets/stop_2.png"/>
+	<!--This is only to give a visual of the color being mixed-->
+	<s:Rect height="30" width="50%"  id="r">
+		<s:fill>
+			<s:SolidColor color="{colorValue}" />
+		</s:fill>
+	</s:Rect>
+	</s:HGroup>		
+	
+	<s:HGroup width="100%" >		
+	<!--RED-->
+	<s:Label width="30%" height="30" fontSize="15" text="Red" textAlign="left"
+			 verticalAlign="middle"/>
+	<s:HSlider id="rSlider" height="30" change="setColor()"
+			   maximum="254" minimum="0" stepSize="1" width="70%"/>
+	</s:HGroup>		
+
+	<s:HGroup width="100%" >		
+	<!--GREEN-->
+	<s:Label width="30%" height="30" fontSize="15" text="Green" textAlign="left"
+			 verticalAlign="middle" />
+	<s:HSlider id="gSlider" height="30" change="setColor()"
+			   maximum="254" minimum="0" stepSize="1" width="70%"/>
+	</s:HGroup>		
+
+	<s:HGroup width="100%" >		
+	<!--BLUE-->
+	<s:Label  width="30%" height="30" fontSize="15" text="Blue" textAlign="left"
+			 verticalAlign="middle"/>
+	<s:HSlider id="bSlider" height="30" change="setColor()"
+			   maximum="254" minimum="0" stepSize="1" width="70%"/>
+	</s:HGroup>		
+
+	</s:VGroup>
+	
+</s:SkinnablePopUpContainer>

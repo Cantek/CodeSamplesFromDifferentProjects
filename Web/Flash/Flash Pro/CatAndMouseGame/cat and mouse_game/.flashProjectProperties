@@ -1,0 +1,44 @@
+﻿<projectDescription>
+	<id>1238637846607</id>
+	<name>~cat and mouse_game</name>
+	<asVersion>0</asVersion>
+	<boundTemplate>file:///C|/Users/Cantek/AppData/Local/Adobe/Flash CS4/en/Configuration/Project/templates/boundClass_as3.as</boundTemplate>
+	<classTemplate>file:///C|/Users/Cantek/AppData/Local/Adobe/Flash CS4/en/Configuration/Project/templates/standardClass_as3.as</classTemplate>
+	<classPath>.</classPath>
+	<rootURI>C:\Users\Cantek\Desktop\cat and mouse_game</rootURI>
+	<flexSDK/>
+	<sources editable="false"/>
+	<libraries editable="false"/>
+	<externalLibraries editable="false"/>
+	<compileList editable="false">
+		<uri label="~cat and mouse_game.fla">file:///C|/Users/Cantek/Desktop/cat and mouse_game/~cat and mouse_game.fla</uri>
+	</compileList>
+	<defaultApp>file:///C|/Users/Cantek/Desktop/cat and mouse_game/~cat and mouse_game.fla</defaultApp>
+	<recentFiles editable="false">
+		<uri label="None.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/fl/transitions/easing/None.as</uri>
+		<uri label="TweenEvent.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/fl/transitions/TweenEvent.as</uri>
+		<uri label="Tween.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/fl/transitions/Tween.as</uri>
+		<uri label="bgSound.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/bgSound.as</uri>
+		<uri label="catSound.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/catSound.as</uri>
+		<uri label="catcherSound.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/catcherSound.as</uri>
+		<uri label="gateSound.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/gateSound.as</uri>
+		<uri label="keySound.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/keySound.as</uri>
+		<uri label="levelSound.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/levelSound.as</uri>
+		<uri label="wallSound.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/wallSound.as</uri>
+		<uri label="winSound.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/winSound.as</uri>
+		<uri label="Arrow.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/Arrow.as</uri>
+		<uri label="Tile.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/Tile.as</uri>
+		<uri label="MainTimeline.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/catandmouse_game_fla/MainTimeline.as</uri>
+		<uri label="ComponentShim.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/fl/core/ComponentShim.as</uri>
+		<uri label="gameWinMovie.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/gameWinMovie.as</uri>
+		<uri label="introMovie.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/introMovie.as</uri>
+		<uri label="levelOne.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/levelOne.as</uri>
+		<uri label="levelThree.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/levelThree.as</uri>
+		<uri label="levelTwo.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/levelTwo.as</uri>
+		<uri label="mouseCatcher.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/mouseCatcher.as</uri>
+		<uri label="mouseMovie.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/mouseMovie.as</uri>
+		<uri label="realMouseMovie.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/realMouseMovie.as</uri>
+		<uri label="gameOverMovie.as">file:///C|/Users/Cantek/Desktop/cat and mouse_game/gameOverMovie.as</uri>
+	</recentFiles>
+	<locations editable="false"/>
+</projectDescription>

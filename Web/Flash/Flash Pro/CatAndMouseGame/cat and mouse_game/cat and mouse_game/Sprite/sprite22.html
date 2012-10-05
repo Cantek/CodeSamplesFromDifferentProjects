@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>sprite22</title>
+</head>
+<body>
+<canvas id="sprite22" width="40" height="40" style="border:2px solid #cccccc;"></canvas>
+<script src=".\sprite22\jaf.js"></script>
+<script>
+ST('sprite22', function(_f) {
+    _f.setFps(24);
+    _f.defaults.debug = false;
+    _f.loop = true;
+    // Create sprite: sprite21
+    var sprite21 = new ST.movieclip('sprite21', 1, true, _f);
+    var l0 = sprite21.layer('l0', 0);
+    l0.frameclip('t0', 0, 0, 1)
+    .shape('shape20', './sprite22/shape20.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 0, 0]);
+
+
+    // Create sprite: mm
+    var mm = new ST.movieclip('mm', 40, true, _f);
+    var l0 = mm.layer('l0', 0);
+    l0.frameclip('t0', 0, 39, 1)
+    .sprite('sprite21', sprite21)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 20, 20])
+    .key(19, [0.850006, 0, 0, 0.850006, 20, 20])
+    .key(39, [1, 0, 0, 1, 20, 20]);
+
+
+
+    _f.mc(mm);
+    _f.start();
+});
+</script>
+</body>
+</html>

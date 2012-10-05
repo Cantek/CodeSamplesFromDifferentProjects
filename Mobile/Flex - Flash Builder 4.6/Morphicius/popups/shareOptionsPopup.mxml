@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						   xmlns:s="library://ns.adobe.com/flex/spark" 
+						   creationComplete="init();"
+						   backgroundAlpha="0"
+						   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			
+			import views.EditorView;
+			
+			public var editor:EditorView = null;
+			
+			private function init():void
+			{
+				PopUpManager.centerPopUp(this);
+								
+			}
+
+			public function shareOnFacebook():void
+			{
+				editor.imageDesc = imagedesc.text;
+				editor.checkConnectivity();
+				this.close();
+			}
+			
+		]]>
+	</fx:Script> 
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" >
+		<s:TextInput id="imagedesc" width="100%" />
+		<s:HGroup width="100%"  horizontalAlign="center" verticalAlign="middle">			
+			<s:Image id="facebookshare" width="50" height="50" click="shareOnFacebook()"
+					 smooth="true" smoothingQuality="high" source="assets/f_logo.png"/>
+			<s:Image id="exit" width="50" height="50" click="this.close()" smooth="true"
+					 smoothingQuality="high" source="assets/stop_2.png"/>
+		</s:HGroup>
+	</s:VGroup>
+</s:SkinnablePopUpContainer>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						   xmlns:s="library://ns.adobe.com/flex/spark" 
+						   backgroundAlpha="0"
+						   width="100%" height="100%"
+						   creationComplete="comboPopUp_creationCompleteHandler(event)"
+						   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:VGroup verticalAlign="middle" horizontalAlign="center" width="100%" height="100%">
+		
+	<s:TileGroup horizontalAlign="center" verticalAlign="middle">
+		<s:Image id="turnLeft" width="50" height="50" click="turnLeftFunction()" smooth="true"
+				 smoothingQuality="high" source="assets/left.png"/>
+		<s:Image id="turnRight" width="50" height="50" click="turnRightFunction()" smooth="true"
+				 smoothingQuality="high" source="assets/right.png"/>
+		<s:Image id="flipHorizontal" width="50" height="50" click="flipHorizontalFunction()"
+				 smooth="true" smoothingQuality="high" source="assets/horizontal.png"/>
+		<s:Image id="flipVertical" width="50" height="50" click="flipVerticalFunction()"
+				 smooth="true" smoothingQuality="high" source="assets/vertical.png"/>
+		<s:Image id="filtersButton" width="50" height="50" click="openFilters()" smooth="true"
+				 smoothingQuality="high" source="assets/edit.png"/>
+		<s:Image id="colorChooser" width="50" height="50" click="openColorChooser()" smooth="true"
+				 smoothingQuality="high" source="assets/colorize.png"/>
+		<s:Image id="cbhs" width="50" height="50" click="openCbhs()" smooth="true"
+				 smoothingQuality="high" source="assets/cbhspng.png"/>
+		<s:Image id="cropImage" width="50" height="50" click="cropImageFunction()" smooth="true"
+				 smoothingQuality="high" source="assets/crop.png"/>
+		<s:Image id="compass" width="50" height="50" click="customRotateFunction()" smooth="true"
+				 smoothingQuality="high" source="assets/compassSmall.png"/>
+<!--		<s:Image id="resize" width="50" height="50" click="resizeFunction()" smooth="true"
+				 smoothingQuality="high" source="assets/resize.png"/>-->
+		<s:Image id="reset" width="50" height="50" click="resetFunction()" smooth="true"
+				 smoothingQuality="high" source="assets/undo.png"/>
+		<s:Image id="save" width="50" height="50" click="saveFunction()" smooth="true"
+				 smoothingQuality="high" source="assets/download.png"/>
+		<s:Image id="exit" width="50" height="50" click="cancel()" smooth="true"
+				 smoothingQuality="high" source="assets/stop_2.png"/>
+	</s:TileGroup>
+
+	</s:VGroup>
+
+	<fx:Script>
+		<![CDATA[
+			import events.ComboEvent;
+			
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import views.EditorView;
+			public var editor:EditorView = null;
+
+			public function cancel():void
+			{
+				this.close();
+			}
+			
+			protected function comboPopUp_creationCompleteHandler(event:FlexEvent):void
+			{
+				PopUpManager.centerPopUp(this);
+			}
+			
+			private function cropImageFunction():void
+			{
+				editor.cropImageFunction();
+			}
+			
+			private function resetFunction():void
+			{
+				editor.resetFunction();
+			}
+			
+			public function flipHorizontalFunction():void
+			{
+				editor.flipHorizontalFunction();
+			}
+			
+			public function flipVerticalFunction():void
+			{
+				editor.flipVerticalFunction();
+			}
+
+			public function turnLeftFunction():void
+			{
+				editor.turnLeftFunction();
+			}
+			
+			public function turnRightFunction():void
+			{
+				editor.turnRightFunction();
+			}
+
+			public function takeLastBack():void
+			{
+				editor.takeLastBack();
+			}
+
+			public function addFilterFunction(caseNum:int):void
+			{
+				editor.addFilterFunction(caseNum);
+			}
+			
+			public function colorHandler(event:ComboEvent):void
+			{
+				editor.colorHandler(event);
+			}
+
+			public function openColorChooser():void
+			{
+				editor.openColorChooser();
+			}
+
+			public function openCbhs():void
+			{
+				editor.openCbhs();
+			}
+			
+			public function customRotateFunction():void
+			{
+				editor.openCustomRotate();
+			}
+			
+			public function openFilters():void
+			{
+				editor.openFilters();
+				this.close();
+			}
+			
+			public function comboHandler(event:ComboEvent):void
+			{
+				editor.comboHandler(event);
+			}
+
+			public function saveFunction():void
+			{
+				editor.saveFunction();
+			}
+			
+			public function resizeFunction():void
+			{
+				editor.resizePopUpFunction();
+			}
+			
+/* 			public function getCamFunction():void
+			{
+				editor.getCamFunction(useCam.label);
+				if(useCam.label == "Camera")
+					useCam.label = "Take Photo";
+				else if(useCam.label == "Take Photo")
+					useCam.label = "Camera";
+				
+				this.close();
+			}
+ */			
+		]]>
+	</fx:Script>
+</s:SkinnablePopUpContainer>

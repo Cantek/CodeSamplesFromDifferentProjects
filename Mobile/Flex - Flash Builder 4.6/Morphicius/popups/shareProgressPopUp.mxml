@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						   xmlns:s="library://ns.adobe.com/flex/spark" 
+						   creationComplete="comboPopUp_creationCompleteHandler(event)"
+						   backgroundColor="#FFFFFF"
+						   backgroundAlpha="0.5"
+						   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			protected function comboPopUp_creationCompleteHandler(event:FlexEvent):void
+			{
+				PopUpManager.centerPopUp(this);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup verticalAlign="middle" horizontalAlign="center" height="100%" width="100%">
+		<s:BusyIndicator id="progressBusy"/>
+		<s:Label id="progressPercent" width="100%" textAlign="center"/>
+	</s:VGroup>
+	
+</s:SkinnablePopUpContainer>

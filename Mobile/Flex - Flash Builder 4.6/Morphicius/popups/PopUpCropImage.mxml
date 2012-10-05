@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:c="imagecropper.*"
+				width="100%" height="100%"
+				backgroundColor="#000000"
+				>	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.milkmangames.nativeextensions.android.AdMob;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.core.IFlexDisplayObject;
+			import mx.events.CloseEvent;
+			import mx.events.ResizeEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.components.Image;
+			
+			import views.EditorView;
+			
+			private var lastSelectedImage:uint = 0;
+			
+			private var currentCropbox:Rectangle;
+			private var currentHandleSize:uint = 15;
+			private var currentCropConstraint:Boolean = false
+			
+
+			public var image:BitmapData = null;
+			public var realImage:Image = null;
+			public var editor:EditorView = null;
+
+			public var croppedImage:Image = null;
+			public function sendImage():void
+			{
+				editor.setImage(croppedImage);
+				this.close();
+			}
+			
+			public function orientationChangeHandler(e:ResizeEvent):void
+			{
+				this.width = editor.width;
+				this.height = editor.height;
+				this.container.width = this.width;
+				this.container.height = this.height;
+				this.containerh.width = this.width;
+				this.containerh.height = this.height * 75 /100;
+				this.containerv.width = this.width;
+				this.containerv.height = this.height * 75 /100;
+				
+				imageCropper.sourceImage = editor.image.bitmapData;
+				
+				trace("width - height" + this.container.width + " - " + this.container.height + " - " + this.container.x + " - " + this.container.y);
+			}
+			
+			public function init():void
+			{
+				this.addEventListener(Event.RESIZE, orientationChangeHandler);
+				croppedImage = new Image();
+				imageCropper.width = this.width;
+				imageCropper.height = this.height * 75/100;
+				PopUpManager.centerPopUp(this);
+				//trace("width - height" + this.container.width + " - " + this.container.height + " - " + this.container.x + " - " + this.container.y);
+				//imageCropper.sourceImage = null;
+				imageCropper.sourceImage = image;
+			}
+			
+			private function imageReady():void 
+			{
+				try
+				{
+					enableControls(true, true);
+					imageCropper.handleSize = currentHandleSize;
+					imageCropper.constrainToAspectRatio = currentCropConstraint;
+					currentCropbox = null;//imageCropper.getCropRect(true);
+					if (!currentCropbox)
+					{
+						imageCropper.setCropRect();
+					}
+					doCrop();
+				}
+				catch(error:Error)
+				{
+				}
+			}
+			private function doCrop():void 
+			{
+				try
+				{
+					var newImage:BitmapData = imageCropper.croppedBitmapData;
+					croppedImage.source = new Bitmap(newImage);
+				}
+				catch(error:Error)
+				{	}
+			}	
+			
+			private function enableControls(enable:Boolean, includeEnabled:Boolean = false):void {				
+				imageCropper.enabled = enable;
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup id="container" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+		<s:HGroup id="containerh" width="100%" height="75%" horizontalAlign="center" verticalAlign="middle">
+			<s:VGroup id="containerv" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+				<c:ImageCropper id="imageCropper"  width="100%" height="100%" enabled="true"  handleColor="#FF00FF" maskColor="#000000" maskAlpha="0.6"
+								sourceImageReady="imageReady()" sourceImageLoadError="trace('Error while loading image')" cropRectChanged="doCrop()" 
+								cropConstraintChanged="trace('Crop constraint changed'); doCrop()" cropDimensionsChanged="trace('Crop dimensions changed'); doCrop()" cropPositionChanged="trace('Crop position changed'); doCrop()" backgroundAlpha="1.0" />			
+			</s:VGroup>
+			<!--<s:VGroup width="50%"  height="100%" verticalAlign="middle" horizontalAlign="center">
+				<s:Label text="Cropped Image"  color="#FFFFFF" />
+					<s:Image visible="false" width="100%" height="100%" id="croppedImage" scaleMode="letterbox" horizontalAlign="center" verticalAlign="middle"/>
+			</s:VGroup>-->
+		</s:HGroup>
+		<s:HGroup width="100%" height="25%">
+			<s:Image id="messageBtn" width="50%" height="100%" click="sendImage()"  source="assets/success.png"/>
+			<s:Image id="messageBtn2" width="50%" height="100%" click="this.close();AdMob.setVisibility(true);" source="assets/stop_2.png"/>
+		</s:HGroup>
+	</s:VGroup>
+</s:SkinnablePopUpContainer>

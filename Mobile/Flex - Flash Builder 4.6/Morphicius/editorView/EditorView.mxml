@@ -1,0 +1,1250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:classes="classes.*"
+		xmlns:popups="popups.*"
+		backgroundColor="black" 
+		backKeyPressed="closePopups()" 
+		color="#000000"
+		creationComplete="checkForImage()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	
+		<popups:filtersPopUp id="comboPopUp"/>
+		<popups:PopUpCropImage id="cropImagePopUp"/>
+		<popups:ColorChooserPopUp id="colorChooserPopUp"/>
+		<popups:notificationPopUp id="notificationPopUp"/>
+		<popups:menuPopUp id="menuPopUp"/>
+		<popups:shareOptionsPopup id="shareOptionsPopup"/>
+		<popups:progressPopUp id="progressPopUp"/>
+		<popups:shareProgressPopUp id="shareProgressPopUp"/>
+		<popups:customRotate id="customRotatePopUp"/>
+		<popups:contrastBrightnessHueSaturationPopUp id="cbhsPopUp"/>
+		<popups:resizePopUp id="resizePopUp"/>		
+	</fx:Declarations>
+
+	<s:titleContent>
+		<s:Image id="toolsbtn" x="0" y="0" width="40" height="40" click="tools()" smooth="true"
+				 smoothingQuality="high" source="assets/tools.png"/>
+		<s:Image id="useCam" width="40" height="40" click="getCamFunction()" smooth="true"
+				 smoothingQuality="high" source="assets/camera.png"/>
+		<s:Image id="share" width="40" height="40" click="shareOptions()" smooth="true"
+				 smoothingQuality="high" source="assets/share.png"/>
+		<s:Image id="switchCam" visible="false" width="40" height="40" click="switchCamFunc()"
+				 source="assets/switch camera.png"/>
+		<s:Image id="ssmm" visible="false" width="40" height="40" click="shortSilentMovieMode()"
+				 source="assets/switch camera.png"/>
+	</s:titleContent>
+	
+	<s:VGroup id="containerContainer" width="100%" height="100%" horizontalAlign="center"
+			  verticalAlign="top">
+		<s:Group id="imageContainer" width="300" height="300">
+				<s:Image id="image" width="100%" height="100%" backgroundColor="#000000"
+						 horizontalAlign="center" scaleMode="letterbox" smooth="true"
+						 smoothingQuality="high" verticalAlign="middle"/>
+<!--			<s:VideoDisplay id="theCam" visible="true" width="100%" height="100%"
+							scaleMode="letterbox" source="_cam"/>
+-->		</s:Group>
+		
+<!--		<s:HGroup verticalAlign="bottom" horizontalAlign="left">
+			<s:Image id="toolsbtnbot" width="40" height="40" click="tools()" smooth="true"
+					 smoothingQuality="high" source="assets/tools.png"/>
+			<s:Image id="useCambot" width="40" height="40" click="getCamFunction()" smooth="true"
+					 smoothingQuality="high" source="assets/camera.png"/>
+			<s:Image id="sharebot" width="40" height="40" click="shareOptions()" smooth="true"
+					 smoothingQuality="high" source="assets/share.png"/>
+			<s:Image id="switchCambot" visible="false" width="40" height="40" click="switchCamFunc()"
+					 source="assets/switch camera.png"/>
+			<s:Image id="ssmmbot" visible="false" width="40" height="40" click="shortSilentMovieMode()"
+					 source="assets/switch camera.png"/>
+		</s:HGroup>-->
+		
+		<s:Image id="webViewClose" visible="false" y="{(this.height/100)*90}" width="100%" height="0"
+				 click="closeWebView()" horizontalAlign="center" source="assets/stop_2.png"
+				 verticalAlign="middle"/>
+	</s:VGroup>
+
+	<s:VGroup id="realImageContainer" horizontalAlign="left" verticalAlign="top">
+		<s:Image id="realImage" visible="false" backgroundColor="#000000"/>				
+	</s:VGroup>
+
+	<fx:Script>
+		<![CDATA[
+			import air.net.URLMonitor;
+			
+			import classes.imageFilters;
+			import classes.imageFiltersReal;
+			import classes.rotations;
+			
+			import com.facebook.graph.Facebook;
+			import com.facebook.graph.FacebookMobile;
+			import com.facebook.graph.windows.MobileLoginWindow;
+			import com.milkmangames.nativeextensions.android.*;
+			import com.milkmangames.nativeextensions.android.events.*;
+			
+			import events.ComboEvent;
+			import events.FLVRecorderEvent;
+			import events.JPEGAsyncCompleteEvent;
+			
+			import flash.globalization.DateTimeFormatter;
+			
+			import flashx.textLayout.events.SelectionEvent;
+			import flashx.textLayout.formats.Float;
+			
+			import mx.core.FlexGlobals;
+			import mx.effects.AnimateProperty;
+			import mx.events.ResizeEvent;
+			import mx.events.TweenEvent;
+			import mx.formatters.DateFormatter;
+			import mx.graphics.codec.JPEGEncoder;
+			import mx.managers.PopUpManager;
+			
+			import org.osmf.layout.ScaleMode;
+			import org.osmf.net.StreamType;
+			
+			import popups.PopUpCropImage;
+			import popups.shareOptionsPopup;
+			
+			import spark.components.TileGroup;
+			import spark.components.VideoDisplay;
+			import spark.components.mediaClasses.DynamicStreamingVideoItem;
+			import spark.components.mediaClasses.DynamicStreamingVideoSource;
+			import spark.primitives.BitmapImage;
+			
+			import utils.JPEGAsyncEncoder;
+			
+			import video.FLVRecorder;
+			
+			public var imagefilter:imageFilters = new imageFilters();
+			public var imagefilterReal:imageFiltersReal = new imageFiltersReal();
+			public var rotationsClass:rotations = new rotations();
+			public var camTurned:Boolean = false;
+			private var user:Object = new Object();
+			
+			private var fileSys:File = new File();
+			
+			
+			
+			//////////////////////////
+			
+			
+			private var camera:CameraUI;
+			private var loader:Loader;
+
+			private function mediaEventComplete(event:MediaEvent):void{
+				var mediaPromise:MediaPromise = event.data;
+				if(mediaPromise.file == null){
+					loader = new Loader();
+					loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loaderCompleted);
+					loader.loadFilePromise(mediaPromise);
+					return;
+				}
+				if (loader) {
+					loader.unload();
+					loader = null;
+				}
+				if (mediaPromise.mediaType == MediaType.IMAGE) {
+					loadImage(mediaPromise);
+				} else if (mediaPromise.mediaType == MediaType.VIDEO) {
+					//showInfo("Fichier " + mediaPromise.relativePath + " créé");
+				}
+			}
+			
+			private function loaderCompleted(e:Event):void{
+				var loaderInfo:LoaderInfo = e.target as LoaderInfo;
+				if(CameraRoll.supportsAddBitmapData){
+					setSizes();
+					var bitmapData:BitmapData = new BitmapData(loaderInfo.width, loaderInfo.height);
+					bitmapData.draw(loaderInfo.loader);
+					image.source = bitmapData;
+					realImage.source = bitmapData;
+					rotationsClass.matrixReal = realImageContainer.transform.matrix;
+				}
+				exitFromCamera();
+			}
+			
+			public function loadImage(mediaPromise:MediaPromise):void {
+				loader = new Loader();
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loaderCompleted);
+				//loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+				loader.loadFilePromise(mediaPromise);
+			}
+			
+			private function onCameraUICancel(event:Event):void {
+				exitFromCamera();
+			}
+			/**
+			 * Erreur lors du process
+			 */
+			private function onCameraUIErrorEvent(event:ErrorEvent):void {
+				exitFromCamera();
+			}
+			
+			//////////////////////////
+			
+			
+			public function browseImage():void
+			{
+				var imagefilter:FileFilter = new FileFilter("Image Files","*.jpg;*.png;*.bmp;*.jpeg");
+				fileSys.browseForOpen("Image Chooser",[imagefilter]);
+				fileSys.addEventListener(Event.SELECT,onSelect);
+			}
+			
+			public function onSelect(e:Event):void
+			{
+				image.scaleMode = ScaleMode.NONE;
+				fileSys = File(e.target);
+				image.percentHeight = 100;
+				image.percentWidth = 100;
+				trace(fileSys.url.toString());
+				image.source = fileSys.url;
+				image.addEventListener(Event.COMPLETE,imageLoaded);
+			}
+			
+			public function exitFromCamera():void
+			{
+				//theCam.visible=false;
+/* 				takePhotoBtn.visible = false;
+				exitCamera.visible = false;
+ *//* 				recordSilentMovieBtn.visible = false;
+				stopRecordBtn.visible = false;
+ */				
+				useCam.source = "assets/camera.png";
+				if(image.source != null)
+				{
+					image.visible = true;
+				}
+				else
+				{
+					//rotationsClass.turnLeftFunctionForVideo(theCam);
+					navigator.pushView(ImageView);
+				}
+			}
+			
+			public function setSizes():void
+			{
+				var generalWidth:int = 0;
+				if(this.width < this.height)
+				{
+					generalWidth = this.width;
+				}
+				else
+				{
+					generalWidth = this.height;
+				}
+				imageContainer.width = generalWidth;
+				imageContainer.height = generalWidth;
+				image.width = generalWidth;
+				image.height = generalWidth;
+				//theCam.width = generalWidth;
+				//theCam.height = generalWidth;
+				
+				comboPopUp.width = this.width;
+				comboPopUp.height = this.height;
+				if(comboPopUp.isOpen)
+				{
+					comboPopUp.close();
+					comboPopUp.open(this,true);
+				}
+				
+				cropImagePopUp.editor = this;
+				cropImagePopUp.width = this.width;
+				cropImagePopUp.height = this.height;
+				
+				colorChooserPopUp.width = this.width*80/100;
+				colorChooserPopUp.height = this.height*80/100;
+				if(colorChooserPopUp.isOpen)
+				{
+					colorChooserPopUp.close();
+					colorChooserPopUp.open(this,true);
+				}
+				notificationPopUp.width = this.width*80/100;
+				notificationPopUp.height = this.height*80/100;
+				if(notificationPopUp.isOpen)
+				{
+					notificationPopUp.close();
+					notificationPopUp.open(this,true);
+				}
+				menuPopUp.width = this.width;
+				menuPopUp.height = this.height;
+				if(menuPopUp.isOpen)
+				{
+					menuPopUp.close();
+					menuPopUp.open(this,true);
+				}
+				shareOptionsPopup.width = this.width*80/100;
+				shareOptionsPopup.height = this.height*80/100;
+				if(shareOptionsPopup.isOpen)
+				{
+					shareOptionsPopup.close();
+					shareOptionsPopup.open(this,true);
+				}
+				progressPopUp.width = this.width;
+				progressPopUp.height = this.height;
+				if(progressPopUp.isOpen)
+				{
+					progressPopUp.close();
+					progressPopUp.open(this,true);
+				}
+				shareProgressPopUp.width = this.width;
+				shareProgressPopUp.height = this.height;
+				if(shareProgressPopUp.isOpen)
+				{
+					shareProgressPopUp.close();
+					shareProgressPopUp.open(this,true);
+				}
+			}
+			
+			public function closePopups():void
+			{
+				comboPopUp.close();
+				cropImagePopUp.close();
+				colorChooserPopUp.close();
+				notificationPopUp.close();
+				menuPopUp.close();
+				shareOptionsPopup.close();
+				progressPopUp.close();
+				shareProgressPopUp.close();
+			}
+			
+			public function orientationChangeHandler(e:ResizeEvent):void
+			{
+				setSizes();
+			}
+			
+			
+			public function checkForImage():void
+			{				
+				//this.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, orientationChangeHandler);
+				if(CameraUI.isSupported){
+					camera = new CameraUI();
+					camera.addEventListener(MediaEvent.COMPLETE, mediaEventComplete);
+					camera.addEventListener(ErrorEvent.ERROR, onCameraUIErrorEvent);
+					camera.addEventListener(Event.CANCEL, onCameraUICancel);
+				}
+
+				this.addEventListener(Event.RESIZE, orientationChangeHandler);
+				setSizes();
+				if(this.data)
+				{
+					realImage.source = Image(data).source;
+					image.source = realImage.source;
+					image.addEventListener(Event.COMPLETE,imageLoaded);
+				}
+				else
+				{
+ 					if(!camTurned)
+					{
+						//rotationsClass.turnRightFunctionForVideo(theCam);
+						camTurned = true;
+					}
+ 					getCamFunction();					
+				}
+			}
+
+			public function imageLoaded(e:Event):void
+			{
+				realImage.width = image.sourceWidth;
+				realImage.height = image.sourceHeight;
+				
+				if(realImage.width <= realImage.height)
+				{
+					realImageContainer.horizontalAlign = "left";
+					realImageContainer.width = realImage.height;
+					realImageContainer.height = realImage.height;
+					rotationsClass.matrixReal = realImageContainer.transform.matrix;
+				}
+				else
+				{
+					realImageContainer.height = realImage.width;
+					realImageContainer.width = realImage.width;
+					rotationsClass.matrixReal = realImageContainer.transform.matrix;
+				}
+			}
+			
+			public function tools():void
+			{
+				menuPopUp.editor = this;
+				menuPopUp.width = this.width;
+				menuPopUp.height = this.height;
+				menuPopUp.open(this,true);
+			}
+			
+			public function resetFunction():void
+			{
+				rotationsClass.resetRotationsAndFlips(rotationNum,flipVerticalNum,flipHorizontalNum,image);
+				rotationsClass.resetRotationsAndFlipsReal(rotationNum,flipVerticalNum,flipHorizontalNum,realImage);
+				try{
+					if(customRotatePopUp != null)
+					{
+						rotationsClass.rotateByAngleCompass(-1*rotationsClass.rotationAngle,customRotatePopUp.customRotateCompass);
+					}
+				}
+				catch(e:Error){}
+				rotationsClass.rotationAngle = 0;
+				rotationNum = 0;
+				flipVerticalNum = 0;
+				flipHorizontalNum = 0;
+				image.filters = null;
+				realImage.filters = null;
+				//theCam.filters = null;
+				imagefilter.resetFiltersArray();
+				imagefilterReal.resetFiltersArray();
+				imagefilterReal.resetColor(realImage);
+				imagefilter.resetColor(image);
+			}
+			
+			public function cropImageFunction():void
+			{
+				progressPopUp.width = this.width;
+				progressPopUp.height = this.height;
+				progressPopUp.open(this,true);
+				
+				AdMob.setVisibility(false);
+				
+				if(rotationsClass.rotationAngle != 0)
+				{
+					var lastHeight:int = 0;
+					var lastWidth:int = 0;
+					lastHeight = realImage.getBounds(realImageContainer).height;
+					lastWidth = realImage.getBounds(realImageContainer).width;
+					var cropB:BitmapData = new BitmapData(lastWidth, lastHeight,true,0);
+					cropB.draw(realImage,realImage.transform.matrix);
+					cropImagePopUp.image = cropB;
+				}
+				else
+				{
+					cropImagePopUp.image = image.bitmapData;
+				}
+				cropImagePopUp.realImage = realImage;
+				cropImagePopUp.realImage.filters = null;
+				cropImagePopUp.editor = this;
+				cropImagePopUp.width = this.width;
+				cropImagePopUp.height = this.height;
+				cropImagePopUp.open(this,true);
+				cropImagePopUp.init();
+				progressPopUp.close();
+			}
+			
+			public function setImage(imageCropped:Image):void
+			{
+/* 				trace("width = "+image.width);
+				trace("height = "+image.height);
+				trace("cropped height = "+imageCropped.height);
+				trace("cropped width = "+imageCropped.width);
+ */				
+				realImage.source = imageCropped.source;
+				image.source = imageCropped.source;
+				realImage.width = imageCropped.sourceWidth;
+				realImage.height = imageCropped.sourceHeight;
+				if(realImage.width <= realImage.height)
+				{
+					realImageContainer.width = realImage.height;
+					realImageContainer.height = realImage.height;
+				}
+				else
+				{
+					realImageContainer.height = realImage.width;
+					realImageContainer.width = realImage.width;
+				}
+				AdMob.setVisibility(true);
+			}
+			
+			
+			public var monitor:URLMonitor;
+			public var imageDesc:String = '';
+			public function checkConnectivity():void
+			{
+				monitor = new URLMonitor(new URLRequest('http://www.adobe.com'));
+				monitor.addEventListener(StatusEvent.STATUS, announceStatus);
+				monitor.start();
+			}
+
+			public var isConnected:Boolean = false;
+			
+			public function announceStatus(e:StatusEvent):void {
+				if( monitor.available)
+					isConnected = true;
+				else
+					isConnected = false;
+
+				if(isConnected)
+				{
+					initializeFacebook();
+				}
+				else
+				{
+					notificationPopUp.success = false;
+					notificationPopUp.messageEx = "Check internet Connectivity!";
+					notificationPopUp.open(this,true);
+				}
+			}
+
+			
+			public function initializeFacebook():void
+			{
+				imageDescription = imageDesc;
+				FacebookMobile.init("418179458210194",authApp);
+			}
+			
+			public function shareOnFacebook(success:Object,fail:Object):void
+			{
+				trace("i m here");
+			}
+
+			public var webv:StageWebView = new StageWebView();
+			
+			public function authApp(success:Object,fail:Object):void
+			{
+  				if(success)
+				{
+					if (FacebookMobile.getSession().accessToken)
+					{
+						uploadPhoto();
+					}
+				}
+				else
+				{
+ 				
+					webViewClose.visible=true;
+					webViewClose.height = 35;
+					webv.viewPort = new Rectangle(0,100, this.stage.width,  this.containerContainer.height - webViewClose.height);
+					webViewClose.y = webv.viewPort.y + webv.viewPort.height;
+					FacebookMobile.login(getuserinfo,this.stage,new Array('email,user_birthday,status_update,publish_stream,user_photos,user_videos'),webv);
+					//trace('fail:\n' + JSON.stringify(fail));
+ 				}
+			}
+			
+			public function closeWebView():void
+			{
+				webv.viewPort = null;
+				webViewClose.height = 0;
+				webViewClose.visible=false;
+			}
+			
+			public var imageDescription:String = "Shared";
+			
+			public function shareRealImage():void
+			{
+				var graph_url:String = "/"+FacebookMobile.getSession().uid.toString()+"/photos";
+				var imageDetails:Array = new Array();
+				imageDetails['message'] =  imageDescription + '  via Morphicius';
+				imageDetails['fileName'] = 'Morphicius';
+				imageDetails['accessToken'] = FacebookMobile.getSession().accessToken;
+				imageDetails['image'] = imgByteArray;
+				imageDetails['fileUpload'] = true;
+				shareProgressPopUp.width = this.width;
+				shareProgressPopUp.height = this.height;
+				shareProgressPopUp.open(this,true);
+				shareProgressPopUp.progressPercent.text = "Uploading to Facebook";
+				FacebookMobile.postData(graph_url,sharedOnFacebook,imageDetails);
+			}
+			
+			public function uploadPhoto():void
+			{
+				webViewClose.visible=false;
+				issave = false;
+				progressPopUp.width=this.width;
+				progressPopUp.height=this.height;
+				progressPopUp.open(this,true);
+				if(rotationNum%2)
+				{
+					b = new BitmapData(this.realImage.height, this.realImage.width);
+					b.draw(realImage,realImage.transform.matrix,realImage.transform.colorTransform);
+				}
+				else
+				{
+					b = new BitmapData(this.realImage.width, this.realImage.height);
+					b.draw(realImage,realImage.transform.matrix,realImage.transform.colorTransform);
+				}
+				asyncEncode(b);				
+			}
+			
+			public function sharedOnFacebook(success:Object,fail:Object):void
+			{
+				//PopUpManager.removePopUp(shareProgressPopUp);
+				shareProgressPopUp.close();
+				if(success)
+				{
+					notificationPopUp.success = true;
+					notificationPopUp.messageEx = "Shared Successfuly";
+				}
+				else
+				{
+					notificationPopUp.success = false;
+					notificationPopUp.messageEx = "Couldnt Share !";
+				}
+				notificationPopUp.open(this,true);
+				trace('fail:\n' + JSON.stringify(fail));
+			}
+			
+			
+			public function getuserinfo(success:Object,fail:Object):void
+			{				
+				user = JSON.stringify(success) as Object;
+				uploadPhoto();
+			}
+			
+			public var camReal:Camera = new Camera();
+			public var vo:Video = null;
+			public var caminuse:Boolean = false;
+			public var _cam:DynamicStreamingVideoSource =  new DynamicStreamingVideoSource();
+			public var _dynVideoSource:DynamicStreamingVideoSource;
+			
+			public var selectedCam:int = 0;
+			public var cameranames:Array = Camera.names;
+			public var cam:Camera = Camera.getCamera(cameranames[selectedCam]);
+			
+			public function switchCamFunc():void
+			{
+/* 				if(((selectedCam+1) % cameranames.length ) > 0)
+				{
+					selectedCam +=1
+					rotationsClass.turnRightFunctionForVideo(theCam);
+					rotationsClass.turnRightFunctionForVideo(theCam);
+				}
+				else
+				{
+					selectedCam = 0;
+					rotationsClass.turnRightFunctionForVideo(theCam);
+					rotationsClass.turnRightFunctionForVideo(theCam);					
+				}
+				
+				cam = Camera.getCamera(cameranames[selectedCam]);
+				changeCamFunction();
+ */			}
+			
+			public function setCamera():void
+			{
+				if(CameraUI.isSupported)
+				{
+					camera.launch(MediaType.IMAGE);
+					useCam.source = "assets/takephoto.png";
+				}
+				else
+				{
+					notificationPopUp.messageEx = "Camera could not be found!";
+					notificationPopUp.success = false;
+					notificationPopUp.width = this.width;
+					notificationPopUp.height = this.height;
+					notificationPopUp.open(this,true);
+					exitFromCamera();
+/* 	 				if(!camTurned)
+					{
+						rotationsClass.turnRightFunctionForVideo(theCam);
+						camTurned = true;
+					}
+		
+	 				rotationsClass.matrixReal = realImageContainer.transform.matrix;
+					caminuse = true;
+					_dynVideoSource=new DynamicStreamingVideoSource();
+					var videoItems:Vector.<DynamicStreamingVideoItem>;
+					videoItems=new Vector.<DynamicStreamingVideoItem>();
+					videoItems[0]=new DynamicStreamingVideoItem();
+					_dynVideoSource.host= "";
+					_dynVideoSource.streamType=StreamType.LIVE;
+					_dynVideoSource.streamItems=videoItems;
+					
+					theCam.source=_dynVideoSource;
+					
+					this.stage.scaleMode = StageScaleMode.NO_SCALE;
+					
+					theCam.visible = true;
+					image.visible = false;
+					theCam.scaleMode = ScaleMode.LETTERBOX;
+					cam.setMode(theCam.width, theCam.height, cam.fps, false);
+					cam.setQuality(0,100);
+					try{
+						theCam.videoObject.attachCamera(cam);
+					}
+					catch(e:Error)
+					{}
+ *//* 					takePhotoBtn.visible = true;
+					exitCamera.visible = true;
+ */				}
+				
+ 			}
+			
+			public function getCamFunction():void
+			{
+				setSizes();
+				if(Camera.getCamera() && useCam.source == "assets/camera.png" )
+				{
+					setCamera();
+				}
+				else if(Camera.getCamera() && useCam.source == "assets/takephoto.png" )
+				{
+					takephotofunction();
+				}
+			}
+			
+			public function changeCamFunction():void
+			{
+				setSizes();
+				if(Camera.getCamera() && useCam.source == "assets/takephoto.png" )
+				{
+					setCamera();
+				}
+			}
+
+			public function takephotofunction():void
+			{
+/* 				caminuse = false;
+				theCam.width = theCam.width * 4;
+				theCam.height = theCam.height * 4;
+				theCam.scaleMode = StageScaleMode.NO_SCALE;
+				cam.setMode(theCam.width, theCam.height, cam.fps, true);
+				cam.setLoopback(true);
+				cam.setMotionLevel(0);
+				cam.setQuality(0,100);
+				theCam.videoObject.attachCamera(cam);
+				theCam.validateNow();
+				var bmd: BitmapData = new BitmapData(theCam.width, theCam.height);
+				bmd.draw(theCam);
+				image.source = bmd;
+				image.filters = imagefilter.filtersArrayAll;
+				image.transform.matrix = theCam.transform.matrix;
+				image.transform.colorTransform = theCam.transform.colorTransform;
+				//rotationsClass.turnRightFunction(image);
+				realImage.source = image.source;
+				realImage.filters = imagefilterReal.filtersArrayAll;
+				realImage.transform.matrix = theCam.transform.matrix;
+				realImage.transform.colorTransform = theCam.transform.colorTransform;
+				rotationsClass.matrixReal = realImageContainer.transform.matrix;
+				//rotationsClass.turnRightFunction(realImage);
+				useCam.source = "assets/camera.png";
+				theCam.visible = false;
+				image.visible = true;
+ *//*  				takePhotoBtn.visible = false;
+				exitCamera.visible = false;
+ */			}
+			
+			public function str_replace(new_str:String, old_str:String, full_str:String ):String
+			{
+				var array:Array = full_str.split(old_str);
+				return array.join(new_str);
+			}
+			
+			public function resizePopUpFunction():void
+			{
+				resizePopUp.width = this.width;
+				resizePopUp.height = this.height;
+				resizePopUp.editor = this;
+				resizePopUp.open(this,true);
+			}
+			
+			public function resizeFunction(ratio:int):void
+			{
+				realImage.source = imagefilterReal.resizeImage(realImage.bitmapData,ratio);
+			}
+			
+			
+			public var imgByteArray:ByteArray = null;
+			
+			public var b:BitmapData = null;
+						
+			public function saveFunction():void
+			{
+				progressPopUp.width = this.width;
+				progressPopUp.height = this.height;
+				progressPopUp.open(this,true);
+				issave = true;
+				
+				if(rotationsClass.rotationAngle != 0)
+				{
+					var lastHeight:int = 0;
+					var lastWidth:int = 0;
+					lastHeight = realImage.getBounds(realImageContainer).height;
+					lastWidth = realImage.getBounds(realImageContainer).width;
+					b = new BitmapData(lastWidth, lastHeight,true,0);
+					b.draw(realImage,realImage.transform.matrix,realImage.transform.colorTransform);
+				}
+/*  				if(rotationNum%2)
+				{
+					b = new BitmapData(this.realImage.height, this.realImage.width);
+				}
+ */				else
+				{
+					b = new BitmapData(this.realImage.width, this.realImage.height);
+					b.draw(realImage,realImage.transform.matrix,realImage.transform.colorTransform);
+ 				}
+				asyncEncode(b);
+			}			
+			
+			
+			public function saveRealImage():void
+			{
+				var CurrentDateTime:Date = new Date();
+				var CurrentDF:DateFormatter = new DateFormatter();
+				CurrentDF.formatString = "MM/DD/YY LL:NN:SS A";
+				var DateTimeString:String = CurrentDF.format(CurrentDateTime);
+				DateTimeString = str_replace(""," ",DateTimeString);
+				DateTimeString = str_replace("_",":",DateTimeString);
+				DateTimeString = str_replace("_","/",DateTimeString);
+				
+				var fl:File = File.documentsDirectory.resolvePath("morphicius/"+DateTimeString+".jpg"); 
+				try
+				{
+					var fs:FileStream=new FileStream;
+					fs.open(fl,FileMode.WRITE);
+					fs.writeBytes(imgByteArray,0,imgByteArray.length);
+					fs.close();
+					notificationPopUp.messageEx = "Picture Saved Succesfully!";
+					notificationPopUp.success = true;
+					notificationPopUp.open(this,false);
+				}
+				catch(e:Error)
+				{
+					notificationPopUp.messageEx = "Could not save the picture!";
+					notificationPopUp.success = false;
+					notificationPopUp.open(this,false);				
+				}			
+			}
+			
+			public function onZoom(e:TransformGestureEvent):void
+			{
+				var watch:Sprite = e.target as Sprite;
+				watch.scaleX *= e.scaleX;
+				watch.scaleY *= e.scaleY;
+			}
+			
+			public function onRotate(e:TransformGestureEvent):void
+			{
+				var watch:Sprite = e.target as Sprite;
+				watch.rotation += e.rotation;
+			}
+			
+			public function onPan(e:TransformGestureEvent):void
+			{
+				if(e.target is Image)
+				{
+				}
+			}
+			
+			public function setSelected():void
+			{
+			}
+			
+			public function openFilters():void
+			{
+				//comboPopUp.dp = filtersArrayCollection;
+				//comboPopUp.addEventListener(ComboEvent.COMBO_CLOSED,comboHandler);
+				comboPopUp.height = this.height;
+				comboPopUp.width = this.width;
+				comboPopUp.open(this,true);
+			}
+			
+			public function comboHandler(event:ComboEvent):void
+			{
+				addFilterFunction(event.picked.filterId);
+			}
+			public function openColorChooser():void
+			{
+				menuPopUp.close();
+				colorChooserPopUp.addEventListener(ComboEvent.COMBO_CLOSED,colorHandler);
+				colorChooserPopUp.width = this.width/100 * 80;
+				colorChooserPopUp.height = this.height;
+				colorChooserPopUp.editor = this;
+				colorChooserPopUp.open(this,true);
+			}
+			
+			public function openCbhs():void
+			{
+				menuPopUp.close();
+				cbhsPopUp.width = this.width/100 * 80;
+				cbhsPopUp.height =  this.height;
+				cbhsPopUp.edit = this;
+				cbhsPopUp.open(this,true);	
+			}
+			
+			public function openCustomRotate():void
+			{
+				menuPopUp.close();
+				customRotatePopUp.width = this.width;
+				customRotatePopUp.height = this.height;
+				customRotatePopUp.open(this,true);
+				rotationsClass.matrixCompass = customRotatePopUp.compassRealContainer.transform.matrix;
+			}
+			
+						
+			
+			public function brightness(brightness:int,hue:int,sat:int,cont:int):void
+			{
+				image.filters = imagefilter.brightness(brightness,hue,sat,cont);
+				realImage.filters = imagefilterReal.brightness(brightness,hue,sat,cont);
+			}
+			
+			public var colorValue:uint = new uint();
+			
+			public function colorHandler(event:ComboEvent):void
+			{
+				colorValue = event.picked.colorValue;
+				addFilterFunction(10);
+				this.tools();
+			}
+			
+			public function addFilterFunction(caseNum:int):void
+			{
+				switch(caseNum)
+				{
+					case 0:
+					{
+						comboPopUp.close();
+						break;
+					}
+					case 1:
+					{
+						if(caminuse)
+						{
+							////theCam.filters = imagefilter.blur();
+						}
+						else
+						{
+							image.filters = imagefilter.blur();
+							realImage.filters = imagefilterReal.blur();
+						}
+						break;
+					}
+					case 2:
+					{
+						if(caminuse)
+						{
+							//theCam.filters = imagefilter.invertImage();
+							image.filters = imagefilter.invertImage();
+							realImage.filters = imagefilterReal.invertImage();
+						}
+						else
+						{
+							image.filters = imagefilter.invertImage();
+							realImage.filters = imagefilterReal.invertImage();
+						}
+						break;
+					}
+					case 3:
+					{
+						if(caminuse)
+						{
+							//theCam.filters = imagefilter.sharpen(theCam.width/100);
+							image.filters = imagefilter.sharpen(image.width/100);
+							realImage.filters = imagefilterReal.sharpen(realImage.width/100);
+						}
+						else
+						{
+							image.filters = imagefilter.sharpen(image.width/100);
+							realImage.filters = imagefilterReal.sharpen(realImage.width/100);
+						}
+						break;
+					}
+					case 4:
+					{
+						if(caminuse)
+						{
+							//theCam.filters = imagefilter.edgeDetection(theCam.width/100);
+							image.filters = imagefilter.edgeDetection(image.width/100);
+							realImage.filters = imagefilterReal.edgeDetection(realImage.width/100);
+						}
+						else
+						{
+							image.filters = imagefilter.edgeDetection(image.width/100);
+							realImage.filters = imagefilterReal.edgeDetection(realImage.width/100);
+						}
+						break;
+					}
+					case 5:
+					{
+						if(caminuse)
+						{
+							//theCam.filters = imagefilter.bevel(theCam.width/7);
+							image.filters = imagefilter.bevel(image.width/7);
+							realImage.filters = imagefilterReal.bevel(realImage.width/7);
+						}
+						else
+						{
+							image.filters = imagefilter.bevel(image.width/7);
+							realImage.filters = imagefilterReal.bevel(realImage.width/7);
+						}
+						break;
+					}
+					case 6:
+					{
+						if(caminuse)
+						{
+							////theCam.filters = imagefilter.emboss(theCam.width/100);
+							image.filters = imagefilter.emboss(image.width/100);
+							realImage.filters = imagefilterReal.emboss(realImage.width/100);
+						}
+						else
+						{
+							image.filters = imagefilter.emboss(image.width/100);
+							realImage.filters = imagefilterReal.emboss(realImage.width/100);
+						}
+						break;
+					}
+					case 7:
+					{
+						if(caminuse)
+						{
+							////theCam.filters = imagefilter.negativeImage();
+							image.filters = imagefilter.negativeImage();
+							realImage.filters = imagefilterReal.negativeImage();
+						}
+						else
+						{
+							image.filters = imagefilter.negativeImage();
+							realImage.filters = imagefilterReal.negativeImage();
+						}
+						break;						
+					}
+					case 10 :
+					{
+						if(!caminuse)
+						{
+							imagefilter.setColor(colorValue,image);
+							imagefilterReal.setColor(colorValue,realImage);
+						}
+						break;
+					}
+					case 11:
+					{
+						if(caminuse)
+						{
+							////theCam.filters = imagefilter.dropShadow(theCam.width/7);
+							image.filters = imagefilter.dropShadow(image.width/7);
+							realImage.filters = imagefilterReal.dropShadow(realImage.width/7);
+						}
+						else
+						{
+							image.filters = imagefilter.dropShadow(image.width/7);
+							realImage.filters = imagefilterReal.dropShadow(realImage.width/7);
+						}
+						break;
+					}
+					case 12:
+					{
+						if(caminuse)
+						{
+							////theCam.filters = imagefilter.glow();
+							image.filters = imagefilter.glow();
+							realImage.filters = imagefilterReal.glow();
+						}
+						else
+						{
+							image.filters = imagefilter.glow();
+							realImage.filters = imagefilterReal.glow();
+						}
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+				
+				//realImage.filters = image.filters;
+			}
+			
+			
+			public function takeLastBack():void
+			{
+				image.filters = imagefilter.takeLastBack();
+				realImage.filters = imagefilterReal.takeLastBack();
+			}
+			
+			public var rotationNum:int = 0;
+			
+			public function turnLeftFunction():void
+			{
+				rotationsClass.turnLeftFunction(image);
+				rotationsClass.turnLeftRealFunction(realImage);
+				realImageContainer.horizontalAlign = "left";
+				rotationNum+=1;
+			}
+			
+			public function turnRightFunction():void
+			{
+				rotationsClass.turnRightFunction(image);
+				rotationsClass.turnRightRealFunction(realImage);
+				realImageContainer.horizontalAlign = "left";
+				rotationNum-=1;
+			}
+			
+			
+			public function rotateByAngle(angle:int,compass:Image):void
+			{
+				rotationsClass.rotateByAngleCompass(angle,compass);
+				rotationsClass.rotateByAngleThumbImage(angle,image);
+				rotationsClass.rotateByAngle(angle,realImage);
+			}
+			
+			public var flipHorizontalNum:int = 0;
+			public var flipVerticalNum:int = 0;
+			
+			public function flipHorizontalFunction():void
+			{
+				rotationsClass.flipHorizontalFunction(image);
+				rotationsClass.flipHorizontalRealFunction(realImage);
+				flipHorizontalNum+=1;
+			}
+			
+			public function flipVerticalFunction():void
+			{
+				rotationsClass.flipVerticalFunction(image);
+				rotationsClass.flipVerticalRealFunction(realImage);
+				flipVerticalNum+=1;
+			}
+			
+			public function zoomByOrigin(direction:String):void
+			{
+			}
+			
+			public function shareOptions():void
+			{
+				shareOptionsPopup.editor = this;
+				shareOptionsPopup.width = this.width;
+				shareOptionsPopup.height = this.height;
+				shareOptionsPopup.open(this,true);
+			}
+			
+			private var asyncEncoder:JPEGAsyncEncoder;
+			
+			private function asyncEncode(b:BitmapData):void
+			{
+				asyncEncoder = new JPEGAsyncEncoder(100);
+				asyncEncoder.PixelsPerIteration = ((b.height * b.width) / 3000) + 5;
+				asyncEncoder.addEventListener(ProgressEvent.PROGRESS, updateProgress);
+				asyncEncoder.addEventListener(JPEGAsyncCompleteEvent.JPEGASYNC_COMPLETE, asyncComplete);
+				asyncEncoder.encode(b);
+			}
+			
+			private function updateProgress(event:ProgressEvent):void
+			{
+				progressPopUp.progressPercent.text = (event.bytesLoaded / event.bytesTotal * 100).toFixed() + "%" + " Complete";
+			}
+			
+			public var issave:Boolean = false;
+			
+			private function asyncComplete(event:JPEGAsyncCompleteEvent):void
+			{
+				//PopUpManager.removePopUp(progressPopUp);
+				progressPopUp.close();
+				imgByteArray = event.ImageData;
+				if(issave)
+					saveRealImage();
+				else
+					shareRealImage();
+			}
+			
+			
+			import mx.core.UIComponent;
+			import mx.events.FlexEvent;
+			private var videoFile:File;
+			private var recorder:FLVRecorder=FLVRecorder.getInstance()
+			private var fps:uint = 10;
+			private var timer:Timer;
+			protected function shortSilentMovieMode():void
+			{	
+				setCamera();
+				//theCam.filters=imagefilter.negativeImage();
+				timer = new Timer(1000/fps);
+				timer.addEventListener(TimerEvent.TIMER, captureScreen);
+				timer.addEventListener(TimerEvent.TIMER_COMPLETE, stopRecording);
+/* 				recordSilentMovieBtn.visible = true;
+				stopRecordBtn.visible = true;
+ *//* 				exitCamera.visible=true;
+ */			}
+			
+			protected function stopRecording():void
+			{
+/* 				var CurrentDateTime:Date = new Date();
+				var CurrentDF:DateFormatter = new DateFormatter();
+				CurrentDF.formatString = "MM/DD/YY LL:NN:SS A";
+				var DateTimeString:String = CurrentDF.format(CurrentDateTime);
+				DateTimeString = str_replace(""," ",DateTimeString);
+				DateTimeString = str_replace("_",":",DateTimeString);
+				DateTimeString = str_replace("_","/",DateTimeString);
+				
+				videoFile=File.documentsDirectory.resolvePath("CieImages/CIE"+DateTimeString+".flv"); 
+				recorder.setTarget(videoFile,theCam.width,theCam.height,8,systemManager);
+
+				timer.stop();
+				//when saving is done
+				recorder.addEventListener(FLVRecorderEvent.FLV_CREATED, fileMade)
+				//when saving starts
+				recorder.addEventListener(FLVRecorderEvent.FLV_START_CREATION, startCreatingFLV)
+				
+				// TODO Auto-generated method stub
+				recorder.stopRecording()
+ */				
+			}
+			
+			private function startCreatingFLV(e:FLVRecorderEvent):void{
+				progressPopUp.width = this.width;
+				progressPopUp.height = this.height;
+				progressPopUp.open(this,true);
+				recorder.addEventListener(FLVRecorderEvent.PROGRESS,onFLVCreationProgress)
+			}
+			
+			private function onFLVCreationProgress(e:FLVRecorderEvent):void{
+				//e.progress: percent complete (0 to 1)
+				//pbSaving: ProgressBar component in Flex
+				trace("saving progress ", e.progress,1);
+				progressPopUp.progressPercent.text = (e.progress * 100).toFixed() + "%" + " Complete";
+			}
+			
+			protected function captureScreen(event:TimerEvent):void
+			{
+				trace("captured screen");
+				//recorder.captureComponent(theCam);     //DisplayObject, takes a screenshot from that component
+				
+			}
+			
+			protected function startRecording():void
+			{
+				// TODO Auto-generated method stub
+				timer.start();
+			}
+			
+			protected function fileMade(event:Event):void
+			{
+				trace("file made");
+				progressPopUp.close();
+			}
+
+			public function shareVideoOnFacebook():void
+			{
+				var graph_url:String = "/"+FacebookMobile.getSession().uid.toString()+"/videos";
+				var videoDetails:Array = new Array();
+				videoDetails['message'] =  imageDescription + '  <a href="http://www.morphicius.com" target ="_blank"> via Morphicius</a>';
+				videoDetails['fileName'] = videoFile.name;
+				videoDetails['accessToken'] = FacebookMobile.getSession().accessToken;
+				videoDetails['video'] = videoFile;
+				videoDetails['fileUpload'] = true;
+				shareProgressPopUp.width = this.width;
+				shareProgressPopUp.height = this.height;
+				shareProgressPopUp.open(this,true);
+				shareProgressPopUp.progressPercent.text = "Uploading to Facebook";
+				Facebook.uploadVideo("/me/videos",uploadVideoToFacebook,videoDetails);
+			}
+
+			public function uploadVideoToFacebook(success:Object,fail:Object):void
+			{
+				//PopUpManager.removePopUp(shareProgressPopUp);
+				shareProgressPopUp.close();
+				if(success)
+				{
+					notificationPopUp.messageEx = "Shared Successifuly";
+					notificationPopUp.success = true;
+				}
+				else{
+					notificationPopUp.messageEx = "Couldnt Share !";
+					notificationPopUp.success = false;
+				}
+				
+				notificationPopUp.open(this,true);
+				trace('fail:\n' + JSON.stringify(fail)); 
+			}
+
+			
+		]]>
+	</fx:Script>
+</s:View>

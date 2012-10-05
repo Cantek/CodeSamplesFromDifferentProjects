@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+						   xmlns:s="library://ns.adobe.com/flex/spark"
+						   width="100%" height="100%" backgroundAlpha="0"
+						   creationComplete="creationCompleteHandler(event)"
+						   >
+
+	<!--						   mouseDown="mouseDown(event)"
+	mouseMove="mouseMove(event)" mouseUp="mouseUp(event)" 
+	mouseOut="mouseUp(event)"
+	-->
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:VGroup id="compassContainer" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" >
+		<s:VGroup id="compassRealContainer" width="200" height="200" horizontalAlign="center" verticalAlign="middle">
+			<s:Image id="customRotateCompass" width="200" height="200" scaleMode="letterbox" source="assets/compass.png" horizontalAlign="center" verticalAlign="middle"/>	
+		</s:VGroup>
+		<s:HGroup>			
+			<s:Image id="turnLeft" width="50" height="50" buttonMode="true" 
+					 source="assets/left.png"  mouseDown="mouseDown(event)" mouseUp="mouseUp(event)"/>
+			<s:Image id="turnRight" width="50" height="50"
+					 source="assets/right.png" buttonMode="true"  mouseDown="mouseDown(event)" mouseUp="mouseUp(event)"/>
+			<s:Image id="exit" width="50" height="50" click="edit.tools(); this.close();"
+					 source="assets/stop_2.png"/>
+		</s:HGroup>
+	</s:VGroup> 
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.utils.clearInterval;
+			import flash.utils.setInterval;
+			
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import views.EditorView;
+			
+			public var edit:EditorView = null;
+			
+			public var changeAngle:int = 1;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				PopUpManager.centerPopUp(this);
+				edit = this.owner as EditorView;
+			}
+	
+			public var rightCurrentAngle:int = 0;
+			public var leftCurrentAngle:int = 0;
+			
+			public var mouseOldX:int = 0;
+			public var mouseOldY:int = 0;
+				
+			public var isdown:Boolean = false;
+			public var isset:int = 0;
+			
+			public var direction:int = 0;
+			
+			public var myInterval:uint;
+			
+			public function mouseUp(e:MouseEvent):void
+			{
+				isdown = false;
+				clearInterval(myInterval);
+/* 				mouseOldX = 0;
+				mouseOldY = 0;
+				isset = 0;
+ */			}
+
+			public function mouseDown(e:MouseEvent):void
+			{
+				isdown = true;
+				if(e.currentTarget == turnLeft)
+					direction = -1;
+				if(e.currentTarget == turnRight)
+					direction = 1;
+				
+				rotate();
+				myInterval = setInterval(rotate,100);
+/* 				mouseOldX = 0;
+				mouseOldY = 0;
+				isset = 0;
+ */			}
+			
+			
+			public function rotate():void
+			{
+				if(isdown)
+					edit.rotateByAngle(direction * changeAngle,customRotateCompass);
+			}
+			
+			public function mouseMove(e:MouseEvent):void
+			{
+				if(isdown)
+				{
+					var xDif:int = e.stageX - mouseOldX;
+					var yDif:int = e.stageY - mouseOldY;
+					if(isset == 0)
+					{
+						trace('y diff ::: ' + yDif + '    x dif :::  ' + xDif);
+						if(Math.abs(xDif)>Math.abs(yDif))
+						{
+							changeX(xDif,e);
+							isset = 1;
+						}
+						else if(Math.abs(yDif)>Math.abs(xDif))
+						{
+							changeY(yDif,e);
+							isset = 2;
+						}
+					}
+					else if(isset == 1)
+					{
+						changeX(xDif,e);
+					}
+					else if(isset == 2)
+					{
+						changeY(yDif,e);
+					}
+				}
+			}
+			
+			public function changeX(xDif:int,e:MouseEvent):void
+			{
+				if(e.stageY < this.height/2)
+				{
+					if(xDif>0)
+					{
+						if(xDif > this.width/100)
+						{
+							edit.rotateByAngle(changeAngle,customRotateCompass);
+							mouseOldX = e.stageX;
+						}
+					}
+					else
+					{
+						if(xDif < this.width/100 * -1)
+						{
+							edit.rotateByAngle(changeAngle * -1,customRotateCompass);
+							mouseOldX = e.stageX;
+						}
+					}
+				}
+				else
+				{
+					if(xDif>0)
+					{
+						if(xDif > this.width/100)
+						{
+							edit.rotateByAngle(changeAngle * -1,customRotateCompass);
+							mouseOldX = e.stageX;
+						}
+					}
+					else
+					{
+						if(xDif < this.width/100 * -1)
+						{
+							edit.rotateByAngle(changeAngle,customRotateCompass);
+							mouseOldX = e.stageX;
+						}
+					}
+				}			
+			}
+			
+			public function changeY(yDif:int,e:MouseEvent):void
+			{
+				if(e.stageX > this.width/2)
+				{
+					if(yDif>0)
+					{
+							edit.rotateByAngle(changeAngle,customRotateCompass);
+							mouseOldY = e.stageY;
+					}
+					else
+					{
+							edit.rotateByAngle(changeAngle * -1,customRotateCompass);
+							mouseOldY = e.stageY;
+					}
+				}
+				else
+				{
+					if(yDif>0)
+					{
+							edit.rotateByAngle(changeAngle * -1,customRotateCompass);
+							mouseOldY = e.stageY;
+					}
+					else
+					{
+							trace('i m here');
+							edit.rotateByAngle(changeAngle,customRotateCompass);
+							mouseOldY = e.stageY;
+					}
+				}			
+			}
+		]]>
+	</fx:Script>
+</s:SkinnablePopUpContainer>

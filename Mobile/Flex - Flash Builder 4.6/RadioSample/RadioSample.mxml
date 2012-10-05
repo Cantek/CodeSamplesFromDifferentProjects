@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Ülkü Net"
+		addedToStage="playRadio()"
+		>
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+			import flash.utils.flash_proxy;
+			
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.HTTPService;
+			
+			import org.osmf.net.StreamingURLResource;
+			import org.osmf.utils.URL;
+			
+			import spark.components.Application;
+			private var radioList:ArrayCollection = new ArrayCollection;
+			private var radioNameList:ArrayCollection = new ArrayCollection;
+			private var radioCatNameList:ArrayCollection = new ArrayCollection;
+			private var radioCataddressList:ArrayCollection = new ArrayCollection;
+			public var webv:StageWebView = new StageWebView();
+			
+			private function initApp():void
+			{
+				registerMovementHandler();
+				radioList.removeAll();
+				radioNameList.removeAll();
+				initializeTurkishRadioList();
+			}
+			
+			private function initializeTurkishRadioList():void
+			{
+				var temp:Object = new Object;
+				temp.address ="http://www.uchilal.net:8000";//"http://fgc.impek.tv:80" 
+				temp.name ="FG Radio";
+				radioNameList.addItem(temp.name);
+				radioList.addItem(temp);				
+			}
+			
+			private function getRadioList(selectedIndex:int):void
+			{
+				var obj:Object = radioCataddressList.getItemAt(selectedIndex);
+				var catService:HTTPService = new HTTPService;
+				catService.url="http://www.circass.com/airRadio/"+obj.address;
+				catService.method = "GET";
+				catService.addEventListener(ResultEvent.RESULT,result_getRadioList);
+				catService.addEventListener(FaultEvent.FAULT,fault_getRadioList);
+				catService.send();
+			}
+			
+			private function result_getRadioList(event:ResultEvent):void
+			{
+				var obj:Object = event.result;
+				radioNameList.removeAll();
+				if(obj)
+				{
+					for(var i= 0; i < obj.radioList.radio.length; i++)
+					{
+						var temp:Object = new Object;
+						temp.address = obj.radioList.radio[i].address; 
+						temp.name = obj.radioList.radio[i].name;
+						radioNameList.addItem(temp.name);
+						radioList.addItem(temp);
+					}
+				}
+			}
+			private function fault_getRadioList(event:FaultEvent):void
+			{
+			}
+			
+			private function initializeRadioList():void
+			{
+				radioList.removeAll();
+				radioNameList.removeAll();				
+			}
+			
+			private function getRadioCatList():void
+			{
+				radioCatNameList.removeAll();
+				var catService:HTTPService = new HTTPService;
+				catService.url="http://www.circass.com/airRadio/radioList.xml";
+				catService.method = "GET";
+				catService.addEventListener(ResultEvent.RESULT,result_getCatList);
+				catService.addEventListener(FaultEvent.FAULT,fault_getCatList);
+				catService.send();
+			}
+			
+			private function result_getCatList(event:ResultEvent):void
+			{
+				var obj:Object = event.result;
+				if(obj)
+				{
+					for(var i= 0; i < obj.radioList.radio.length; i++)
+					{
+						var radioObj:Object = new Object;
+						radioObj.name = obj.radioList.radio[i].name;
+						radioObj.address = obj.radioList.radio[i].address;
+						radioCatNameList.addItem(radioObj.name);
+						radioCataddressList.addItem(radioObj);
+					}
+					initializeRadioList();
+				}
+			}
+			
+			private function fault_getCatList(event:FaultEvent):void
+			{
+				
+			}
+						
+			public function mouseDrag(e:MouseEvent):void 
+			{
+				if (e.target == e.currentTarget) 
+				{
+					this.stage.nativeWindow.startMove();
+				}
+			}
+			
+			public function registerMovementHandler():void 
+			{
+				controlBar.addEventListener(MouseEvent.MOUSE_DOWN, mouseDrag);
+			}
+			
+			public var radio:Sound = null;
+			public var channel:SoundChannel = new SoundChannel();
+			public var sTransform:SoundTransform = new SoundTransform();
+			
+			private function playRadio():void
+			{
+				var temp:Object = new Object;
+				temp.address ="http://www.uchilal.net:8000";//"http://fgc.impek.tv:80" 
+				temp.name ="FG Radio";
+				
+				try{
+					var radioUrl:URLRequest = new URLRequest(temp.address+"/;");
+					stopSong();
+					var context:SoundLoaderContext = new SoundLoaderContext(8000, true);
+					radio = new Sound;
+					radio.load(radioUrl,context);
+					channel = radio.play();
+				}
+				catch(error:Error)
+				{}
+			}
+			
+			private function stopSong():void{
+				channel.stop();
+			}
+			private function changeVolume():void{
+				sTransform.volume = volumeSlider.value;
+				channel.soundTransform = sTransform;
+			}
+
+			private function closeApplication():void
+			{
+				NativeApplication.nativeApplication.exit();
+			}
+			
+			private function mute():void
+			{
+				if(volumeIcon.source == "assets/volume.png")
+				{
+					sTransform.volume = 0;
+					volumeIcon.source = "assets/mute.png"
+					channel.soundTransform = sTransform;
+					volumeSlider.value = 0;
+				}
+				else if(volumeIcon.source == "assets/mute.png")
+				{
+					sTransform.volume = 2.4;
+					volumeIcon.source = "assets/volume.png"
+					channel.soundTransform = sTransform;
+					volumeSlider.value = 2.4;
+				}
+			}
+
+		]]>
+	</fx:Script>
+
+	
+	<s:VGroup height="100%" width="100%" id="radioContainer" verticalAlign="bottom" horizontalAlign="center">
+		<s:Image height="100%" width="100%"  source="@Embed('assets/logo.png')" smooth="true" left="0" right="0" top="0" bottom="0" />
+		<s:HGroup id="controlBar" width="100%" height="60" verticalAlign="bottom" horizontalAlign="center">
+			<s:Image source="assets/close.png" click="closeApplication()"  width="35" height="35" smooth="true"
+					 smoothingQuality="high"/>
+			<s:Image id="volumeIcon" width="35" height="35" click="mute()" smooth="true"
+					 smoothingQuality="high" source="assets/volume.png"/>
+			<s:HSlider width="100%" snapInterval="0.2" change="changeVolume()" id="volumeSlider" minimum="0" maximum="5" liveDragging="true" value="1"/>
+		</s:HGroup>
+	</s:VGroup>		
+</s:View>

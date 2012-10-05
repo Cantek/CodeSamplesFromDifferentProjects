@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
+				showCloseButton="true"
+				styleName="noPadding"
+				creationComplete="init();"
+				close="titleWindow_close(event);"
+				title="Video Panel"
+				 chromeColor="#262334" cornerRadius="20" backgroundColor="#020202" borderAlpha="1.0">
+	
+	<mx:Style>
+		.noPadding {
+			paddingBottom: 0;
+			paddingTop: 0;
+			paddingLeft: 0;
+			paddingRight: 0;
+		}
+	</mx:Style>
+	
+	<mx:Script>
+		<![CDATA[
+			
+			/** VideoDisplay: This component is created by Cantek ÇETİN
+			 *  VideoDisplay is an extended videoDisplay object of adobe. 
+			 *  This component is evolved for using on WADO
+			 */
+			
+
+			import mx.managers.IFocusManagerComponent;
+			import mx.controls.Alert;
+			import mx.core.IFlexDisplayObject;
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
+			
+			[Bindable]
+			public var source:String;
+			
+			private function init():void {
+				PopUpManager.centerPopUp(this);
+				if(videoDisplay.videoWidth > 900)
+					this.width = 900;
+				if(videoDisplay.videoHeight > 600)
+					this.height = 600;
+				videoSlider.maximum = videoDisplay.totalTime;
+				videoSlider.minimum = 0;
+			}
+			
+			private function titleWindow_close(evt:CloseEvent):void {
+				PopUpManager.removePopUp(evt.target as IFlexDisplayObject);
+			}
+			
+			private function play():void
+			{
+				videoDisplay.play();
+			}
+			private function pause():void
+			{
+				videoDisplay.pause();
+			}
+			private function sliderChanged():void
+			{
+				//videoDisplay.pause();
+				videoDisplay.playheadTime = videoSlider.value;
+			}
+
+			private function startPlaying():void
+			{
+				//videoDisplay.playheadTime = videoSlider.value;
+				//videoDisplay.play();
+			}			
+			
+		]]>
+		
+	</mx:Script>
+	
+	
+	
+	<mx:VideoDisplay id="videoDisplay" width="100%" height="100%"
+					 source="{source}"
+					 resize="init();"  dropShadowVisible="true"/>
+	
+	
+	<mx:ControlBar horizontalAlign="right" width="100%">
+		<mx:HBox verticalAlign="middle" horizontalAlign="center" width="100%" dropShadowVisible="true" cornerRadius="4" backgroundColor="#020202">
+			<mx:HBox verticalAlign="middle" horizontalAlign="left" width="100%">
+				<mx:Image source="assets/media-playback-start.png" width="35" height="35" click="play()"/>
+				<mx:Image source="assets/media-playback-pause.png" width="35" height="35" click="pause()"/>
+			</mx:HBox>
+			<mx:HBox verticalAlign="middle" horizontalAlign="center" width="100%">
+				<mx:HSlider id="videoSlider" width="100%" change="sliderChanged()" mouseDown="pause()" mouseUp="play()" value="{videoDisplay.playheadTime}"/>
+			</mx:HBox>
+			<mx:HBox verticalAlign="middle" horizontalAlign="right" width="100%">
+				<mx:Label text="{videoDisplay.playheadTime} ::: {videoDisplay.totalTime}"/>
+			</mx:HBox>
+		</mx:HBox>
+	</mx:ControlBar>
+	
+	
+</mx:TitleWindow>

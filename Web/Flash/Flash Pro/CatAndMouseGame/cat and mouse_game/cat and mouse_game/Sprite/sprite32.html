@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>sprite32</title>
+</head>
+<body>
+<canvas id="sprite32" width="42" height="42" style="border:2px solid #cccccc;"></canvas>
+<script src=".\sprite32\jaf.js"></script>
+<script>
+ST('sprite32', function(_f) {
+    _f.setFps(24);
+    _f.defaults.debug = false;
+    _f.loop = true;
+    // Create sprite: mm
+    var mm = new ST.movieclip('mm', 10, true, _f);
+    var l0 = mm.layer('l0', 0);
+    l0.frameclip('t0', 0, 9, 1)
+    .shape('shape31', './sprite32/shape31.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 20, 22])
+    .key(9, [1, 0, 0, 1, 22, 20]);
+
+
+
+    _f.mc(mm);
+    _f.start();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						   xmlns:s="library://ns.adobe.com/flex/spark"  creationComplete="comboPopUp_creationCompleteHandler(event)"
+						   backgroundColor="#123123"
+						   backgroundAlpha="0"
+						   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import events.ComboEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import views.EditorView;
+			
+			[Bindable]
+			public var dp:ArrayCollection;
+			
+			public var edit:EditorView = null;
+			
+			protected function comboPopUp_creationCompleteHandler(event:FlexEvent):void
+			{
+				PopUpManager.centerPopUp(this);
+				edit = this.owner as EditorView;
+			}
+			
+/* 			protected function list_changeHandler(event:IndexChangeEvent):void
+			{
+				dispatchEvent(new ComboEvent(ComboEvent.COMBO_CLOSED,list.selectedItem));
+				list.selectedIndex = -1;
+				this.close();
+			}
+ */		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+<!--	<s:List direction="rtl" id="list" width="100%" height="100%" dataProvider="{dp}" change="list_changeHandler(event)" labelField="filterName"/>
+-->
+	<s:VGroup verticalAlign="middle" horizontalAlign="center" width="100%" height="100%">		
+		<s:TileGroup horizontalAlign="center" verticalAlign="middle">
+			<s:Image id="blur" width="50" height="50" click="edit.addFilterFunction(1); "
+					 smooth="true" smoothingQuality="high" source="assets/nature_blur.png" />
+			<s:Image id="invert" width="50" height="50" click="edit.addFilterFunction(2); "
+					 smooth="true" smoothingQuality="high" source="assets/nature_invert.png"/>
+			<s:Image id="sharpen" width="50" height="50" click="edit.addFilterFunction(3); "
+					 smooth="true" smoothingQuality="high" source="assets/nature_sharp.png"/>
+			<s:Image id="edgeDetection" width="50" height="50" click="edit.addFilterFunction(4); "
+					 smooth="true" smoothingQuality="high" source="assets/nature_edge.png"/>
+			<s:Image id="bevel" width="50" height="50" click="edit.addFilterFunction(5); "
+					 smooth="true" smoothingQuality="high" source="assets/nature_bevel.png"/>
+			<s:Image id="emboss" width="50" height="50" click="edit.addFilterFunction(6);"
+					 smooth="true" smoothingQuality="high" source="assets/nature_emboss.png"/>
+			<s:Image id="grayScale" width="50" height="50" click="edit.addFilterFunction(7); "
+					 smooth="true" smoothingQuality="high" source="assets/nature_grayscale.png"/>
+			<s:Image id="dropShadow" width="50" height="50" click="edit.addFilterFunction(11); "
+					 smooth="true" smoothingQuality="high" source="assets/nature_shadow.png"/>
+			<s:Image id="glow" width="50" height="50" click="edit.addFilterFunction(12); "
+					 smooth="true" smoothingQuality="high" source="assets/nature_glow.png"/>
+			<s:Image id="filterBack" width="50" height="50" click="edit.takeLastBack()" smooth="true"
+					 smoothingQuality="high" source="assets/back3.png"/>
+			<s:Image id="cancel" width="50" height="50" click="edit.tools(); this.close();" smooth="true"
+					 smoothingQuality="high" source="assets/stop_2.png"/>
+		</s:TileGroup>
+		
+	</s:VGroup>
+
+</s:SkinnablePopUpContainer>

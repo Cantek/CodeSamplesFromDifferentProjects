@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>sprite91</title>
+</head>
+<body>
+<canvas id="sprite91" width="84" height="84" style="border:2px solid #cccccc;"></canvas>
+<script src=".\sprite91\jaf.js"></script>
+<script>
+ST('sprite91', function(_f) {
+    _f.setFps(24);
+    _f.defaults.debug = false;
+    _f.loop = true;
+    // Create sprite: mm
+    var mm = new ST.movieclip('mm', 25, true, _f);
+    var l0 = mm.layer('l0', 0);
+    l0.frameclip('t0', 0, 24, 1)
+    .shape('shape90', './sprite91/shape90.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 42, 42])
+    .key(12, [-0.999954, 0.000137329, -0.000137329, -0.999954, 42, 42])
+    .key(13, [-0.965912, -0.258652, 0.258652, -0.965912, 42, 42])
+    .key(24, [0.999924, -0.000305176, 0.000305176, 0.999924, 42, 42]);
+
+
+
+    _f.mc(mm);
+    _f.start();
+});
+</script>
+</body>
+</html>

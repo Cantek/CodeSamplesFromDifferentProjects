@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						   xmlns:s="library://ns.adobe.com/flex/spark"
+						   creationComplete="resizePopUp_creationCompleteHandler(event)"
+						   backgroundColor="#FFFFFF"
+						   backgroundAlpha="0.5"
+						   >
+	
+	<fx:Script>
+		<![CDATA[				
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import views.EditorView;
+
+			public var editor:EditorView = null;
+		
+			protected function resizePopUp_creationCompleteHandler(event:FlexEvent):void
+			{
+				PopUpManager.centerPopUp(this);
+			}
+
+			public function changeSize():void
+			{
+				editor.resizeFunction(ratioSlider.value);
+			}
+
+		]]>
+	</fx:Script>
+
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:HGroup width="100%">
+			<s:Image width="25%" height="30" click="changeSize()" smooth="true" smoothingQuality="high"
+					 source="assets/success.png"/>
+			<s:Image width="25%" height="30" click="editor.tools(); this.close()" smooth="true" smoothingQuality="high"
+					 source="assets/stop_2.png"/>
+		</s:HGroup>
+		
+		<s:HGroup width="100%" >
+			<s:Label width="30%" height="30" fontSize="15" text="Red" textAlign="left"
+					 verticalAlign="middle"/>
+		</s:HGroup>
+	
+		<s:HGroup width="100%" >
+			<s:HSlider id="ratioSlider" height="30"
+					   maximum="100" minimum="0" stepSize="1" width="70%"/>
+		</s:HGroup>
+	</s:VGroup>
+	
+</s:SkinnablePopUpContainer>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>sprite36</title>
+</head>
+<body>
+<canvas id="sprite36" width="42" height="42" style="border:2px solid #cccccc;"></canvas>
+<script src=".\sprite36\jaf.js"></script>
+<script>
+ST('sprite36', function(_f) {
+    _f.setFps(24);
+    _f.defaults.debug = false;
+    _f.loop = true;
+    // Create sprite: sprite21
+    var sprite21 = new ST.movieclip('sprite21', 1, true, _f);
+    var l0 = sprite21.layer('l0', 0);
+    l0.frameclip('t0', 0, 0, 1)
+    .shape('shape20', './sprite36/shape20.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 0, 0]);
+
+
+    // Create sprite: sprite22
+    var sprite22 = new ST.movieclip('sprite22', 40, true, _f);
+    var l0 = sprite22.layer('l0', 0);
+    l0.frameclip('t0', 0, 39, 1)
+    .sprite('sprite21', sprite21)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 0, 0])
+    .key(19, [0.850006, 0, 0, 0.850006, 0, 0])
+    .key(39, [1, 0, 0, 1, 0, 0]);
+
+
+    // Create sprite: sprite25
+    var sprite25 = new ST.movieclip('sprite25', 1, true, _f);
+    var l0 = sprite25.layer('l0', 0);
+    l0.frameclip('t0', 0, 0, 1)
+    .shape('shape24', './sprite36/shape24.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 0, 0]);
+
+
+    // Create sprite: sprite26
+    var sprite26 = new ST.movieclip('sprite26', 24, true, _f);
+    var l0 = sprite26.layer('l0', 0);
+    l0.frameclip('t0', 0, 23, 1)
+    .sprite('sprite25', sprite25)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 0, 0])
+    .key(23, [0.800003, 0, 0, 0.800003, 0, 0]);
+
+
+    // Create sprite: sprite29
+    var sprite29 = new ST.movieclip('sprite29', 54, true, _f);
+    var l0 = sprite29.layer('l0', 0);
+
+    // Create sprite: sprite32
+    var sprite32 = new ST.movieclip('sprite32', 10, true, _f);
+    var l0 = sprite32.layer('l0', 0);
+    l0.frameclip('t0', 0, 9, 1)
+    .shape('shape31', './sprite36/shape31.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 0, 0])
+    .key(9, [1, 0, 0, 1, 2, -2]);
+
+
+    // Create sprite: sprite35
+    var sprite35 = new ST.movieclip('sprite35', 1, true, _f);
+    var l0 = sprite35.layer('l0', 0);
+    l0.frameclip('t0', 0, 0, 1)
+    .shape('shape34', './sprite36/shape34.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 0, 0]);
+
+
+    // Create sprite: mm
+    var mm = new ST.movieclip('mm', 90, true, _f);
+    var l0 = mm.layer('l0', 0);
+    l0.frameclip('t0', 0, 89, 1)
+    .shape('shape15', './sprite36/shape15.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(0, [1, 0, 0, 1, 20, 22])
+    .key(8, [1, 0, 0, 1, 20, 22])
+    .key(9, [1.00125, 0, 0, 1, 20, 22])
+    .key(18, [1.00125, 0, 0, 1, 20, 22])
+    .key(19, [1, 0, 0, 1, 20, 22])
+    .key(89, [1, 0, 0, 1, 20, 22]);
+
+    var l1 = mm.layer('l1', 1);
+    l1.frameclip('t0', 19, 28, 1)
+    .shape('shape17', './sprite36/shape17.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(19, [1, 0, 0, 1, 20, 22])
+    .key(28, [1, 0, 0, 1, 20, 22]);
+
+    l1.frameclip('t1', 29, 38, 1)
+    .shape('shape18', './sprite36/shape18.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(29, [1, 0, 0, 1, 20, 22])
+    .key(38, [1, 0, 0, 1, 20, 22]);
+
+    l1.frameclip('t2', 39, 48, 1)
+    .sprite('sprite22', sprite22)
+    .track('mx')
+    .key(39, [1, 0, 0, 1, 20, 22])
+    .key(48, [1, 0, 0, 1, 20, 22]);
+
+    l1.frameclip('t3', 49, 58, 1)
+    .sprite('sprite26', sprite26)
+    .track('mx')
+    .key(49, [1, 0, 0, 1, 20, 22])
+    .key(58, [1, 0, 0, 1, 20, 22]);
+
+    l1.frameclip('t4', 59, 69, 1)
+    .shape('shape28', './sprite36/shape28.svg', 'svg', 0, 0, 1, 0)
+    .track('mx')
+    .key(59, [1, 0, 0, 1, 20, 22])
+    .key(69, [1, 0, 0, 1, 20, 22]);
+
+    l1.frameclip('t5', 70, 79, 1)
+    .sprite('sprite29', sprite29)
+    .track('mx')
+    .key(70, [1, 0, 0, 1, 20, 22])
+    .key(79, [1, 0, 0, 1, 20, 22]);
+
+    l1.frameclip('t6', 80, 89, 1)
+    .sprite('sprite35', sprite35)
+    .track('mx')
+    .key(80, [0.199997, 0, 0, 0.300751, 20, 22])
+    .key(89, [0.199997, 0, 0, 0.300751, 20, 22]);
+
+    var l2 = mm.layer('l2', 2);
+    l2.frameclip('t0', 70, 79, 1)
+    .sprite('sprite32', sprite32)
+    .track('mx')
+    .key(70, [1, 0, 0, 1, 20, 22])
+    .key(79, [1, 0, 0, 1, 20, 22]);
+
+    var l3 = mm.layer('l3', 3);
+
+
+    _f.mc(mm);
+    _f.start();
+});
+</script>
+</body>
+</html>

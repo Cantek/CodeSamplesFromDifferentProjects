@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="Layer_1"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+width="800px" height="460px"
+xml:space="preserve">
+<g id="PathID_1" transform="matrix(1, 0, 0, 1, 400, 230)">
+<path style="fill:#780000;fill-opacity:1" d="M-400 -230L400 -230L400 230L-400 230L-400 -230" />
+</g>
+</svg>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						   xmlns:s="library://ns.adobe.com/flex/spark" 
+						   backgroundAlpha="0.5"
+						   backgroundColor="#FFFFFF"
+						   creationComplete="comboPopUp_creationCompleteHandler()"
+						   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:VGroup verticalAlign="middle" horizontalAlign="center" width="100%" height="100%">
+		<s:HGroup verticalAlign="middle" horizontalAlign="center" width="100%" >
+			<s:Label width="35%" text="Brightness" textAlign="center" verticalAlign="middle"/>
+			<s:HSlider id="brsl" width="65%"
+					   change="edit.brightness(brsl.value,husl.value,stsl.value,ctsl.value)"
+					   maximum="100" minimum="-100" stepSize="1" value="0"/>
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle" horizontalAlign="center" width="100%">
+			<s:Label width="35%" text="Contrast" textAlign="center" verticalAlign="middle"/>			
+			<s:HSlider id="ctsl" width="65%"
+					   change="edit.brightness(brsl.value,husl.value,stsl.value,ctsl.value)"
+					   maximum="100" minimum="-100" stepSize="1" value="0"/>
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle" horizontalAlign="center" width="100%">
+			<s:Label width="35%" text="Saturation" textAlign="center" verticalAlign="middle"/>			
+			<s:HSlider id="stsl" width="65%"
+					   change="edit.brightness(brsl.value,husl.value,stsl.value,ctsl.value)"
+					   maximum="100" minimum="-100" stepSize="1" value="0"/>
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle" horizontalAlign="center" width="100%">			
+			<s:Label width="35%" text="Hue" textAlign="center" verticalAlign="middle"/>
+			<s:HSlider id="husl" width="65%"
+					   change="edit.brightness(brsl.value,husl.value,stsl.value,ctsl.value)"
+					   maximum="100" minimum="-100" stepSize="1" value="0"/>
+		</s:HGroup>
+		<s:Image id="exit" width="50" height="50" click="edit.tools(); this.close()" smooth="true"
+				 smoothingQuality="high" source="assets/stop_2.png"/>
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import views.EditorView;
+			
+			public var edit:EditorView = null;
+			
+			protected function comboPopUp_creationCompleteHandler():void
+			{
+				PopUpManager.centerPopUp(this);
+				//edit = this.owner as EditorView;
+			}
+		]]>
+	</fx:Script>
+</s:SkinnablePopUpContainer>
